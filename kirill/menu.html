@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StuntBike — Каталог</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800;14..32,900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0b0d0f; color: #f0f2f5; min-height: 100vh; }
+
+        .bg-pattern {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 20% 30%, #1a1e24, #0a0c0e 80%); z-index: -2;
+        }
+        .bg-pattern::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" opacity="0.03"><path d="M70 10 L90 40 L70 70 L50 40 Z M130 10 L150 40 L130 70 L110 40 Z M100 50 L120 80 L100 110 L80 80 Z" fill="white"/><circle cx="40" cy="150" r="20" fill="white"/><circle cx="160" cy="150" r="20" fill="white"/></svg>');
+            background-repeat: repeat; background-size: 180px 180px; z-index: -1;
+            animation: drift 60s linear infinite;
+        }
+        @keyframes drift { 0% { transform: translate(0, 0); } 100% { transform: translate(-100px, -50px); } }
+
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 30px; }
+
+        header {
+            display: flex; justify-content: space-between; align-items: center; padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05); flex-wrap: wrap; gap: 15px;
+            position: sticky; top: 0; background: rgba(11, 13, 15, 0.85); backdrop-filter: blur(20px); z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 900; letter-spacing: 1px;
+            background: linear-gradient(135deg, #ff4d4d, #ff9a00, #ff6b35);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            text-transform: uppercase; display: flex; align-items: center; gap: 10px; text-decoration: none;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+        @keyframes glow { 0% { filter: drop-shadow(0 0 5px rgba(255, 107, 53, 0.3)); } 100% { filter: drop-shadow(0 0 20px rgba(255, 107, 53, 0.6)); } }
+        .logo i { -webkit-text-fill-color: initial; color: #ff6b35; font-size: 28px; }
+
+        .nav-links { display: flex; gap: 32px; font-weight: 600; font-size: 13px; letter-spacing: 0.5px; text-transform: uppercase; }
+        .nav-links a { color: #b0b8c5; text-decoration: none; transition: 0.3s; position: relative; }
+        .nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0%; height: 2px; background: #ff6b35; transition: 0.3s; box-shadow: 0 0 10px #ff6b35; }
+        .nav-links a:hover { color: #fff; }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-links a.active { color: #fff; }
+        .nav-links a.active::after { width: 100%; }
+
+        .header-actions { display: flex; align-items: center; gap: 16px; }
+        .header-actions i { font-size: 20px; color: #b0b8c5; transition: 0.3s; cursor: pointer; }
+        .header-actions i:hover { color: #ff6b35; transform: scale(1.1); }
+
+        .btn-outline {
+            border: 1.5px solid #ff6b35; background: transparent; padding: 8px 20px; border-radius: 40px;
+            color: #fff; font-weight: 700; font-size: 12px; transition: 0.3s; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .btn-outline:hover { background: #ff6b35; color: #0b0d0f; box-shadow: 0 0 30px rgba(255, 107, 53, 0.4); transform: scale(1.05); }
+
+        .cart-icon-wrap { position: relative; cursor: pointer; }
+        .cart-count {
+            position: absolute; top: -8px; right: -10px; background: #ff6b35; color: #0b0d0f;
+            font-size: 10px; font-weight: 800; width: 18px; height: 18px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+
+        .breadcrumb { padding: 16px 0 8px; color: #5a6577; font-size: 14px; }
+        .breadcrumb a { color: #8892a0; text-decoration: none; transition: 0.2s; }
+        .breadcrumb a:hover { color: #ff6b35; }
+        .breadcrumb span { color: #b0b8c5; }
+
+        .page-header {
+            display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; margin: 10px 0 30px;
+        }
+        .page-header h1 { font-family: 'Orbitron', sans-serif; font-size: 36px; font-weight: 900; text-transform: uppercase; letter-spacing: -0.5px; }
+        .page-header h1 span { color: #ff6b35; }
+        .page-header p { color: #8892a0; font-size: 16px; }
+
+        .filters {
+            display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 30px;
+            padding: 16px 0; border-top: 1px solid rgba(255, 255, 255, 0.03); border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .filters button {
+            padding: 8px 24px; border-radius: 40px; border: 1.5px solid #1f262e;
+            background: transparent; color: #b0b8c5; font-weight: 600; font-size: 13px;
+            cursor: pointer; transition: 0.3s; font-family: 'Inter', sans-serif;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .filters button:hover { border-color: #ff6b35; color: #fff; }
+        .filters button.active { background: #ff6b35; border-color: #ff6b35; color: #0b0d0f; }
+
+        .menu-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; margin: 30px 0 60px;
+        }
+
+        .menu-item {
+            background: #12171d; border-radius: 30px; padding: 24px; border: 1px solid #1f262e;
+            transition: 0.4s; position: relative; overflow: hidden;
+        }
+        .menu-item::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+            background: linear-gradient(90deg, #ff6b35, #ffb347, #ff4d4d); transform: scaleX(0); transition: 0.4s;
+        }
+        .menu-item:hover::before { transform: scaleX(1); }
+        .menu-item:hover { border-color: #ff6b3570; transform: translateY(-8px); box-shadow: 0 30px 50px -15px #000000cc; }
+
+        .menu-item .item-img {
+            background: #1b222a; border-radius: 24px; padding: 30px 0; text-align: center; position: relative;
+        }
+        .menu-item .item-img i { font-size: 80px; color: #e5e9f0; filter: drop-shadow(0 8px 12px #00000050); transition: 0.5s; }
+        .menu-item:hover .item-img i { transform: scale(1.05) rotate(-5deg); color: #ff6b35; }
+
+        .menu-item .item-img .badge {
+            position: absolute; top: 12px; right: 12px; padding: 4px 14px; border-radius: 40px;
+            font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .badge.sale { background: #ff4d4d; color: #fff; }
+        .badge.new { background: #00c853; color: #fff; }
+        .badge.hot { background: #ff6b35; color: #0b0d0f; animation: badgePulse 1.5s ease-in-out infinite; }
+        .badge.stunt { background: #7c4dff; color: #fff; }
+        .badge.regular { background: #2196f3; color: #fff; }
+        @keyframes badgePulse { 0%, 100% { box-shadow: 0 0 10px rgba(255, 107, 53, 0.3); } 50% { box-shadow: 0 0 30px rgba(255, 107, 53, 0.6); } }
+
+        .menu-item h3 { margin: 16px 0 4px; font-weight: 700; font-size: 19px; }
+        .menu-item .category-tag { color: #8892a0; font-size: 12px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .menu-item .category-tag i { color: #ff6b35; font-size: 11px; }
+        .menu-item .desc { color: #8892a0; font-size: 14px; margin: 8px 0 12px; line-height: 1.5; }
+        .menu-item .specs { display: flex; gap: 16px; color: #5a6577; font-size: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .menu-item .specs i { color: #ff6b35; margin-right: 4px; }
+
+        .menu-item .bottom-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .menu-item .price { font-weight: 800; font-size: 22px; color: #ffb347; }
+        .menu-item .old-price { font-weight: 400; font-size: 15px; color: #5a6577; text-decoration: line-through; margin-left: 8px; }
+
+        .menu-item .actions { display: flex; gap: 8px; }
+        .menu-item .order-btn {
+            background: linear-gradient(135deg, #ff6b35, #ff4d4d); border: none; padding: 10px 18px;
+            border-radius: 40px; font-weight: 700; color: #0b0d0f; cursor: pointer; transition: 0.3s;
+            font-family: 'Inter', sans-serif; font-size: 13px; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .menu-item .order-btn:hover { transform: scale(1.05); box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4); }
+
+        .menu-item .add-cart-btn {
+            background: transparent; border: 1.5px solid #1f262e; padding: 10px 16px;
+            border-radius: 40px; color: #b0b8c5; cursor: pointer; transition: 0.3s;
+            font-family: 'Inter', sans-serif; font-size: 13px;
+        }
+        .menu-item .add-cart-btn:hover { border-color: #ff6b35; color: #fff; }
+
+        footer {
+            border-top: 1px solid #1a2128; padding: 40px 0 30px; margin-top: 40px;
+            display: flex; justify-content: space-between; flex-wrap: wrap; color: #7a8594; font-size: 14px;
+        }
+        footer .socials i { font-size: 20px; margin-left: 18px; color: #7a8594; transition: 0.3s; cursor: pointer; }
+        footer .socials i:hover { color: #ff6b35; transform: translateY(-3px); }
+
+        .toast {
+            position: fixed; bottom: 30px; right: 30px; background: #12171e;
+            border: 1px solid #ff6b35; padding: 16px 28px; border-radius: 16px;
+            color: #fff; font-weight: 600; z-index: 2000;
+            transform: translateY(100px); opacity: 0; transition: 0.5s ease;
+            box-shadow: 0 10px 30px #00000080; display: flex; align-items: center; gap: 12px;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast i { color: #ff6b35; font-size: 20px; }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .container { padding: 0 16px; }
+            .menu-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
+            .page-header h1 { font-size: 26px; }
+            .filters { gap: 6px; }
+            .filters button { padding: 6px 14px; font-size: 11px; }
+        }
+        @media (max-width: 480px) { .menu-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="bg-pattern"></div>
+
+<div class="container">
+    <header>
+        <a href="index.html" class="logo"><i class="fas fa-bolt"></i> Stunt<span>Bike</span></a>
+        <div class="nav-links">
+            <a href="index.html">Главная</a>
+            <a href="menu.html" class="active">Меню</a>
+            <a href="order.html">Заказать</a>
+            <a href="index.html#game">Игра</a>
+        </div>
+        <div class="header-actions">
+            <i class="fas fa-search"></i>
+            <a href="order.html" class="cart-icon-wrap">
+                <i class="fas fa-shopping-bag"></i>
+                <span class="cart-count" id="cartCount">0</span>
+            </a>
+            <a href="login.html" class="btn-outline"><i class="fas fa-user"></i> Войти</a>
+        </div>
+    </header>
+
+    <div class="breadcrumb"><a href="index.html">Главная</a> / <span>Меню</span></div>
+
+    <div class="page-header">
+        <div>
+            <h1>Наше <span>меню</span></h1>
+            <p>Выбери свой идеальный байк или запчасти для экстрима</p>
+        </div>
+        <div style="color:#5a6577; font-size:14px;"><i class="fas fa-tag"></i> <span id="itemsCount">0</span> товаров</div>
+    </div>
+
+    <div class="filters">
+        <button class="active" data-filter="all">Все</button>
+        <button data-filter="bike">🚲 Велосипеды</button>
+        <button data-filter="stunt">🔥 Для станта</button>
+        <button data-filter="regular">🚲 Обычные</button>
+        <button data-filter="wheels">Колёса</button>
+        <button data-filter="brakes">Тормоза</button>
+        <button data-filter="drivetrain">Трансмиссия</button>
+        <button data-filter="frame">Рама / Вилка</button>
+    </div>
+
+    <div class="menu-grid" id="menuGrid"></div>
+
+    <footer>
+        <div>© 2026 StuntBike. Все права защищены.</div>
+        <div class="socials">
+            <i class="fab fa-instagram"></i>
+            <i class="fab fa-youtube"></i>
+            <i class="fab fa-tiktok"></i>
+            <i class="fab fa-vk"></i>
+            <i class="fab fa-telegram"></i>
+        </div>
+    </footer>
+</div>
+
+<div class="toast" id="toast">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastMessage">Товар добавлен в корзину!</span>
+</div>
+
+<script>
+    // ============================================================
+    // 1. ДАННЫЕ ТОВАРОВ
+    // ============================================================
+    const allProducts = [
+        { id: 'b1', name: 'StuntMaster 26', category: 'bike', price: 1890, oldPrice: null, desc: 'Двойная труба, вилка 100мм, усиленная рама', specs: '12.5 кг | 26" | 4130 хром', badge: 'sale', icon: 'fa-bicycle' },
+        { id: 'b2', name: 'StreetFighter 20', category: 'bike', price: 1450, oldPrice: 1650, desc: 'Пеги, ротор, лёгкая конструкция для городских трюков', specs: '10.8 кг | 20" | алюминий', badge: null, icon: 'fa-bicycle' },
+        { id: 'b3', name: 'DirtJump 24', category: 'bike', price: 1670, oldPrice: null, desc: 'Усиленная рама, 100psi, идеален для прыжков', specs: '13.2 кг | 24" | сталь', badge: 'new', icon: 'fa-bicycle' },
+        { id: 'b4', name: 'FlatPro', category: 'bike', price: 2100, oldPrice: 2300, desc: 'Специально для флэтленда, 19" колёса', specs: '9.5 кг | 19" | титан', badge: null, icon: 'fa-bicycle' },
+        { id: 'b5', name: 'ParkRider 22', category: 'bike', price: 1750, oldPrice: null, desc: 'Для скейт-парков и рамп, маневренный и прочный', specs: '11.0 кг | 22" | 4130 хром', badge: 'new', icon: 'fa-bicycle' },
+        { id: 'b6', name: 'Street King', category: 'bike', price: 1980, oldPrice: 2150, desc: 'Топовая модель для стрита, пеги в комплекте', specs: '10.2 кг | 20" | алюминий', badge: 'sale', icon: 'fa-bicycle' },
+        { id: 'b7', name: 'Dirt Evo', category: 'bike', price: 2250, oldPrice: null, desc: 'Профессиональный дёрт-байк, 100мм ход вилки', specs: '11.8 кг | 26" | 4130 хром', badge: null, icon: 'fa-bicycle' },
+        { id: 'b8', name: 'Flat Master', category: 'bike', price: 1890, oldPrice: 2050, desc: 'Легендарная модель для флэтленда с усиленными осями', specs: '9.8 кг | 19" | титан', badge: null, icon: 'fa-bicycle' },
+        { id: 'b9', name: 'Extreme Pro', category: 'bike', price: 2650, oldPrice: 2900, desc: 'Для самых безумных трюков, карбоновая рама', specs: '10.5 кг | 20" | карбон', badge: 'hot', icon: 'fa-bicycle' },
+        { id: 'b10', name: 'Urban Warrior', category: 'bike', price: 1720, oldPrice: null, desc: 'Городской воин, универсальный байк', specs: '11.5 кг | 20" | сталь', badge: null, icon: 'fa-bicycle' },
+        { id: 'b11', name: 'Dirt Storm', category: 'bike', price: 1950, oldPrice: 2100, desc: 'Шторм на трассе, усиленный для экстрима', specs: '12.8 кг | 26" | 4130 хром', badge: 'sale', icon: 'fa-bicycle' },
+        { id: 'b12', name: 'Park King', category: 'bike', price: 1600, oldPrice: null, desc: 'Король скейт-парка, лёгкий и манёвренный', specs: '10.8 кг | 22" | алюминий', badge: 'new', icon: 'fa-bicycle' },
+        { id: 'b13', name: 'Flat Blade', category: 'bike', price: 2050, oldPrice: null, desc: 'Лезвие для баланса, идеален для флэтленда', specs: '9.2 кг | 19" | титан', badge: null, icon: 'fa-bicycle' },
+        { id: 'b14', name: 'Street Shadow', category: 'bike', price: 1550, oldPrice: 1750, desc: 'Тень города, незаметный и быстрый', specs: '10.0 кг | 20" | алюминий', badge: null, icon: 'fa-bicycle' },
+        { id: 'b15', name: 'Extreme Carbon', category: 'bike', price: 3200, oldPrice: null, desc: 'Карбоновая рама, топовая оснастка для профи', specs: '8.9 кг | 20" | карбон', badge: 'hot', icon: 'fa-bicycle' },
+        { id: 'p1', name: 'Пеги Stunt Pro', category: 'stunt', price: 89, oldPrice: null, desc: 'Усиленные стальные пеги для трюков', specs: 'сталь | 100мм | 2 шт', badge: 'stunt', icon: 'fa-skull' },
+        { id: 'p2', name: 'Ротор Gyro V3', category: 'stunt', price: 145, oldPrice: 170, desc: 'Профессиональный ротор для стрита', specs: 'алюминий | 360° | 2 канала', badge: 'stunt', icon: 'fa-cog' },
+        { id: 'p3', name: 'Вилка Stunt Heavy', category: 'stunt', price: 220, oldPrice: null, desc: 'Усиленная вилка для прыжков', specs: 'сталь 4130 | 100мм ход', badge: 'stunt', icon: 'fa-border-all' },
+        { id: 'p4', name: 'Обода Stunt Double', category: 'stunt', price: 160, oldPrice: 190, desc: 'Двойные обода для экстрима', specs: 'алюминий | 20" | 36 спиц', badge: 'stunt', icon: 'fa-circle' },
+        { id: 'p5', name: 'Покрышки Stunt Grip', category: 'stunt', price: 55, oldPrice: null, desc: 'Суперцепкие для скейт-парка', specs: '20" | 2.4" | кевлар', badge: 'new', icon: 'fa-circle' },
+        { id: 'p6', name: 'Тормоза Stunt Hydra', category: 'stunt', price: 180, oldPrice: 210, desc: 'Гидравлические тормоза для станта', specs: 'дисковые | 180мм', badge: 'stunt', icon: 'fa-stop-circle' },
+        { id: 'p7', name: 'Каретка Stunt Pro', category: 'stunt', price: 75, oldPrice: null, desc: 'Усиленная каретка 19мм', specs: 'сталь | 19мм | sealed', badge: 'stunt', icon: 'fa-cogs' },
+        { id: 'p8', name: 'Цепь Stunt Heavy', category: 'stunt', price: 65, oldPrice: null, desc: 'Утолщённая цепь для экстрима', specs: 'Half-link | сталь', badge: 'stunt', icon: 'fa-link' },
+        { id: 'p9', name: 'Седло Stunt Slim', category: 'stunt', price: 45, oldPrice: null, desc: 'Узкое седло для трюков', specs: 'нейлон | 200мм', badge: null, icon: 'fa-chair' },
+        { id: 'p10', name: 'Грипсы Stunt Lock', category: 'stunt', price: 25, oldPrice: null, desc: 'Силиконовые грипсы с блокировкой', specs: '143мм | фланцевые', badge: null, icon: 'fa-hand-grip' },
+        { id: 'p11', name: 'Шипы Stunt Spike', category: 'stunt', price: 35, oldPrice: null, desc: 'Металлические шипы для пегов', specs: 'сталь | 4 шт', badge: 'stunt', icon: 'fa-star' },
+        { id: 'p12', name: 'Колёсная пара City', category: 'regular', price: 120, oldPrice: null, desc: 'Лёгкие колёса для города', specs: 'алюминий | 26" | 32 спиц', badge: 'regular', icon: 'fa-circle' },
+        { id: 'p13', name: 'Покрышки City Comfort', category: 'regular', price: 40, oldPrice: null, desc: 'Универсальные покрышки', specs: '26" | 2.1" | защита от проколов', badge: 'regular', icon: 'fa-circle' },
+        { id: 'p14', name: 'Тормоза City Disc', category: 'regular', price: 95, oldPrice: 115, desc: 'Дисковые тормоза для города', specs: 'механические | 160мм', badge: 'regular', icon: 'fa-stop-circle' },
+        { id: 'p15', name: 'Вилка City Flex', category: 'regular', price: 130, oldPrice: null, desc: 'Вилка с амортизацией 80мм', specs: 'алюминий | 80мм ход', badge: null, icon: 'fa-border-all' },
+        { id: 'p16', name: 'Каретка City Pro', category: 'regular', price: 50, oldPrice: null, desc: 'Каретка с керамическими подшипниками', specs: '24мм | sealed', badge: 'new', icon: 'fa-cogs' },
+        { id: 'p17', name: 'Седло City Comfort', category: 'regular', price: 55, oldPrice: null, desc: 'Анатомическое седло для комфорта', specs: 'гель | 260мм', badge: 'regular', icon: 'fa-chair' },
+        { id: 'p18', name: 'Колесо Stunt 20"', category: 'wheels', price: 150, oldPrice: 170, desc: 'Для станта, усиленное', specs: '20" | 36 спиц | двойной обод', badge: 'stunt', icon: 'fa-circle' },
+        { id: 'p19', name: 'Колесо Dirt 26"', category: 'wheels', price: 175, oldPrice: null, desc: 'Для дёрта, усиленный обод', specs: '26" | 32 спиц | дисковые', badge: null, icon: 'fa-circle' },
+        { id: 'p20', name: 'Колесо Park 22"', category: 'wheels', price: 140, oldPrice: null, desc: 'Для скейт-парка, лёгкое', specs: '22" | 32 спиц | алюминий', badge: 'new', icon: 'fa-circle' },
+        { id: 'p21', name: 'Колесо City 28"', category: 'wheels', price: 110, oldPrice: null, desc: 'Для города, надёжное', specs: '28" | 32 спиц | усиленный', badge: 'regular', icon: 'fa-circle' },
+        { id: 'p22', name: 'Тормоза Stunt V-Brake', category: 'brakes', price: 65, oldPrice: null, desc: 'Для трюков, мощные', specs: 'V-Brake | алюминий', badge: 'stunt', icon: 'fa-stop-circle' },
+        { id: 'p23', name: 'Тормоза City Hydraulic', category: 'brakes', price: 120, oldPrice: 140, desc: 'Гидравлические для города', specs: 'дисковые | 180мм', badge: 'regular', icon: 'fa-stop-circle' },
+        { id: 'p24', name: 'Тормоза Dirt Disc', category: 'brakes', price: 105, oldPrice: null, desc: 'Для дёрта, усиленные', specs: 'механические | 203мм', badge: null, icon: 'fa-stop-circle' },
+        { id: 'p25', name: 'Тормозные колодки Pro', category: 'brakes', price: 25, oldPrice: null, desc: 'Керамические колодки', specs: 'композит | 4 шт', badge: null, icon: 'fa-stop-circle' },
+        { id: 'p26', name: 'Переключатель Stunt', category: 'drivetrain', price: 85, oldPrice: null, desc: 'Профессиональный переключатель', specs: '1x | алюминий', badge: 'stunt', icon: 'fa-cogs' },
+        { id: 'p27', name: 'Переключатель City', category: 'drivetrain', price: 55, oldPrice: null, desc: 'Надёжный переключатель для города', specs: '3x9 | сталь', badge: 'regular', icon: 'fa-cogs' },
+        { id: 'p28', name: 'Кассета Stunt 11-23', category: 'drivetrain', price: 70, oldPrice: 80, desc: 'Для станта, короткая кассета', specs: '11-23T | сталь', badge: 'stunt', icon: 'fa-cogs' },
+        { id: 'p29', name: 'Кассета City 11-34', category: 'drivetrain', price: 60, oldPrice: null, desc: 'Для города, широкий диапазон', specs: '11-34T | сталь', badge: 'regular', icon: 'fa-cogs' },
+        { id: 'p30', name: 'Шатуны Stunt Pro', category: 'drivetrain', price: 95, oldPrice: null, desc: 'Усиленные шатуны 170мм', specs: 'алюминий | 170мм', badge: 'stunt', icon: 'fa-cogs' },
+        { id: 'p31', name: 'Рама Stunt 4130', category: 'frame', price: 350, oldPrice: 390, desc: 'Хромомолибденовая рама для станта', specs: '4130 | 20" | 4.5 кг', badge: 'stunt', icon: 'fa-border-all' },
+        { id: 'p32', name: 'Рама City Alu', category: 'frame', price: 280, oldPrice: null, desc: 'Алюминиевая рама для города', specs: 'алюминий | 26" | 3.2 кг', badge: 'regular', icon: 'fa-border-all' },
+        { id: 'p33', name: 'Вилка Stunt Rigid', category: 'frame', price: 150, oldPrice: 170, desc: 'Жёсткая вилка для станта', specs: 'сталь | 420мм', badge: 'stunt', icon: 'fa-border-all' },
+        { id: 'p34', name: 'Вилка City Suspension', category: 'frame', price: 200, oldPrice: null, desc: 'Вилка с амортизацией 100мм', specs: 'алюминий | 100мм ход', badge: 'regular', icon: 'fa-border-all' },
+        { id: 'p35', name: 'Рама Dirt Pro', category: 'frame', price: 380, oldPrice: null, desc: 'Усиленная рама для дёрта', specs: '4130 | 24" | 5.2 кг', badge: null, icon: 'fa-border-all' },
+    ];
+
+    // ============================================================
+    // 2. РЕНДЕР
+    // ============================================================
+    const grid = document.getElementById('menuGrid');
+    const itemsCount = document.getElementById('itemsCount');
+
+    function renderProducts(filter = 'all') {
+        const filtered = filter === 'all' ? allProducts : allProducts.filter(p => p.category === filter);
+
+        if (filtered.length === 0) {
+            grid.innerHTML = `
+                <div style="grid-column:1/-1; text-align:center; padding:60px 0; color:#8892a0;">
+                    <i class="fas fa-search" style="font-size:48px; margin-bottom:16px; display:block;"></i>
+                    <p style="font-size:18px;">Нет товаров в этой категории</p>
+                </div>
+            `;
+            itemsCount.textContent = '0';
+            return;
+        }
+
+        itemsCount.textContent = filtered.length;
+
+        grid.innerHTML = filtered.map(p => {
+            const badgeMap = {
+                'sale': '<span class="badge sale">🔥 Скидка</span>',
+                'new': '<span class="badge new">✨ Новинка</span>',
+                'hot': '<span class="badge hot">⚡ Хит</span>',
+                'stunt': '<span class="badge stunt">🔥 Стант</span>',
+                'regular': '<span class="badge regular">🚲 Обычные</span>'
+            };
+            const badgeHtml = p.badge ? badgeMap[p.badge] || '' : '';
+            const oldPriceHtml = p.oldPrice ? `<span class="old-price">$${p.oldPrice}</span>` : '';
+
+            return `
+                <div class="menu-item" data-id="${p.id}" data-name="${p.name}" data-price="${p.price}">
+                    <div class="item-img">
+                        <i class="fas ${p.icon}"></i>
+                        ${badgeHtml}
+                    </div>
+                    <h3>${p.name}</h3>
+                    <div class="category-tag"><i class="fas fa-tag"></i> ${p.category}</div>
+                    <div class="desc">${p.desc}</div>
+                    <div class="specs"><span><i class="fas fa-info-circle"></i> ${p.specs}</span></div>
+                    <div class="bottom-row">
+                        <div>
+                            <span class="price">$${p.price}</span>
+                            ${oldPriceHtml}
+                        </div>
+                        <div class="actions">
+                            <button class="add-cart-btn" onclick="addToCart('${p.id}', '${p.name}', ${p.price})">
+                                <i class="fas fa-cart-plus"></i>
+                            </button>
+                            <a href="order.html?product=${encodeURIComponent(p.id)}" class="order-btn">
+                                <i class="fas fa-bolt"></i> Заказать
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // ============================================================
+    // 3. ФИЛЬТРЫ
+    // ============================================================
+    document.querySelectorAll('.filters button').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            renderProducts(this.dataset.filter);
+        });
+    });
+
+    // ============================================================
+    // 4. КОРЗИНА
+    // ============================================================
+    function getCart() { return JSON.parse(localStorage.getItem('stuntCart')) || []; }
+
+    function saveCart(cart) {
+        localStorage.setItem('stuntCart', JSON.stringify(cart));
+        updateCartCount();
+    }
+
+    function updateCartCount() {
+        const cart = getCart();
+        const count = cart.reduce((sum, item) => sum + item.qty, 0);
+        document.getElementById('cartCount').textContent = count;
+    }
+
+    function addToCart(id, name, price) {
+        const cart = getCart();
+        const existing = cart.find(item => item.id === id);
+        if (existing) existing.qty += 1;
+        else cart.push({ id, name, price, qty: 1 });
+        saveCart(cart);
+        showToast(`${name} добавлен в корзину!`);
+    }
+
+    // ============================================================
+    // 5. TOAST
+    // ============================================================
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toastMessage').textContent = message;
+        toast.classList.add('show');
+        clearTimeout(toast._timeout);
+        toast._timeout = setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // ============================================================
+    // 6. ИНИЦИАЛИЗАЦИЯ
+    // ============================================================
+    renderProducts('all');
+    updateCartCount();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('product');
+    if (productId) {
+        const product = allProducts.find(p => p.id === productId);
+        if (product) {
+            setTimeout(() => { addToCart(product.id, product.name, product.price); }, 500);
+        }
+    }
+</script>
+
+</body>
+</html>

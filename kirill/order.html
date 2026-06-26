@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StuntBike — Оформить заказ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,800;14..32,900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif; background: #0b0d0f; color: #f0f2f5;
+            min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative;
+        }
+        .bg-pattern {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 20% 30%, #1a1e24, #0a0c0e 80%); z-index: -2;
+        }
+        .bg-pattern::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" opacity="0.03"><path d="M70 10 L90 40 L70 70 L50 40 Z M130 10 L150 40 L130 70 L110 40 Z M100 50 L120 80 L100 110 L80 80 Z" fill="white"/><circle cx="40" cy="150" r="20" fill="white"/><circle cx="160" cy="150" r="20" fill="white"/></svg>');
+            background-repeat: repeat; background-size: 180px 180px; z-index: -1;
+            animation: drift 60s linear infinite;
+        }
+        @keyframes drift { 0% { transform: translate(0, 0); } 100% { transform: translate(-100px, -50px); } }
+
+        .order-container {
+            background: #12171e; border-radius: 40px; padding: 48px 40px;
+            width: 100%; max-width: 680px; border: 1px solid #1f262e;
+            box-shadow: 0 30px 80px -20px #000000cc; position: relative;
+        }
+
+        .back-link {
+            position: absolute; top: 20px; left: 24px; color: #8892a0; text-decoration: none;
+            font-size: 14px; font-weight: 600; transition: 0.2s; display: flex; align-items: center; gap: 8px;
+        }
+        .back-link:hover { color: #ff6b35; }
+
+        .order-header { text-align: center; margin: 12px 0 24px; }
+        .order-header .logo {
+            font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 900; letter-spacing: 1px;
+            background: linear-gradient(135deg, #ff4d4d, #ff9a00, #ff6b35);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            text-transform: uppercase; display: inline-flex; align-items: center; gap: 10px; text-decoration: none;
+        }
+        .order-header .logo i { -webkit-text-fill-color: initial; color: #ff6b35; font-size: 28px; }
+        .order-header h2 { font-family: 'Orbitron', sans-serif; font-size: 28px; font-weight: 900; margin-top: 12px; letter-spacing: -0.5px; text-transform: uppercase; }
+        .order-header h2 span { color: #ff6b35; }
+        .order-header p { color: #8892a0; margin-top: 8px; font-size: 15px; }
+
+        .order-summary {
+            background: #0c1015; border-radius: 20px; padding: 16px 20px; margin-bottom: 24px; border: 1px solid #1f262e;
+        }
+        .order-summary .summary-title {
+            font-weight: 700; font-size: 14px; color: #8892a0; text-transform: uppercase;
+            letter-spacing: 0.5px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+        }
+        .order-summary .summary-title i { color: #ff6b35; }
+        .order-summary .summary-item {
+            display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .order-summary .summary-item:last-child { border-bottom: none; }
+        .order-summary .summary-item .item-name { color: #b0b8c5; }
+        .order-summary .summary-item .item-qty { color: #5a6577; font-size: 13px; }
+        .order-summary .summary-item .item-price { color: #ffb347; font-weight: 700; }
+
+        .order-summary .summary-total {
+            display: flex; justify-content: space-between; padding: 12px 0 0; margin-top: 8px;
+            border-top: 2px solid #ff6b35; font-weight: 800; font-size: 18px;
+        }
+        .order-summary .summary-total .total-label { color: #fff; }
+        .order-summary .summary-total .total-price { color: #ffb347; font-size: 22px; }
+
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-weight: 600; font-size: 14px; color: #b0b8c5; margin-bottom: 6px; }
+        .form-group label .required { color: #ff4d4d; }
+
+        .form-group .input-wrap {
+            display: flex; align-items: center; background: #0c1015; border-radius: 16px;
+            border: 1.5px solid #1f262e; transition: 0.25s; padding: 0 16px;
+        }
+        .form-group .input-wrap:focus-within { border-color: #ff6b35; box-shadow: 0 0 0 3px #ff6b3520; }
+        .form-group .input-wrap i { color: #5a6577; font-size: 16px; width: 20px; }
+        .form-group .input-wrap input,
+        .form-group .input-wrap select,
+        .form-group .input-wrap textarea {
+            width: 100%; background: transparent; border: none; padding: 16px 12px;
+            font-size: 15px; color: #f0f2f5; font-family: 'Inter', sans-serif; outline: none;
+        }
+        .form-group .input-wrap textarea { resize: vertical; min-height: 80px; }
+        .form-group .input-wrap select { appearance: none; cursor: pointer; }
+        .form-group .input-wrap select option { background: #12171e; color: #f0f2f5; }
+        .form-group .input-wrap input::placeholder,
+        .form-group .input-wrap textarea::placeholder { color: #5a6577; }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+        .btn-order {
+            width: 100%; background: linear-gradient(135deg, #ff6b35, #ff4d4d); border: none;
+            padding: 16px; border-radius: 60px; font-weight: 700; font-size: 17px;
+            color: #0b0d0f; display: flex; align-items: center; justify-content: center; gap: 12px;
+            transition: 0.3s; cursor: pointer; font-family: 'Inter', sans-serif;
+            box-shadow: 0 10px 30px -8px #ff6b3540; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .btn-order:hover { transform: scale(1.02); box-shadow: 0 16px 40px -6px #ff6b3560; }
+        .btn-order:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .order-footer { text-align: center; margin-top: 24px; color: #7a8594; font-size: 14px; }
+        .order-footer i { color: #ff6b35; }
+
+        .success-state { display: none; text-align: center; padding: 30px 0; }
+        .success-state.show { display: block; }
+        .success-state i { font-size: 72px; color: #00c853; margin-bottom: 16px; }
+        .success-state h3 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+        .success-state p { color: #8892a0; margin-bottom: 20px; }
+        .success-state .btn-back {
+            background: #1f262e; border: none; padding: 12px 32px; border-radius: 40px;
+            color: #fff; font-weight: 700; cursor: pointer; transition: 0.2s;
+            font-family: 'Inter', sans-serif; text-decoration: none; display: inline-block;
+        }
+        .success-state .btn-back:hover { background: #ff6b35; color: #0b0d0f; }
+
+        .form-wrapper.hidden { display: none; }
+
+        .empty-cart-message { text-align: center; padding: 20px 0; color: #8892a0; }
+        .empty-cart-message i { font-size: 48px; display: block; margin-bottom: 16px; color: #1f262e; }
+        .empty-cart-message a { color: #ff6b35; font-weight: 700; text-decoration: none; }
+        .empty-cart-message a:hover { text-decoration: underline; }
+
+        @media (max-width: 520px) {
+            .order-container { padding: 32px 20px; }
+            .form-row { grid-template-columns: 1fr; }
+            .order-header h2 { font-size: 22px; }
+            .back-link { top: 12px; left: 16px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-pattern"></div>
+
+<div class="order-container">
+    <a href="menu.html" class="back-link"><i class="fas fa-arrow-left"></i> В меню</a>
+
+    <div class="order-header">
+        <a href="index.html" class="logo"><i class="fas fa-bolt"></i> Stunt<span>Bike</span></a>
+        <h2>Оформить <span>заказ</span></h2>
+        <p>Заполните форму, и мы свяжемся с вами</p>
+    </div>
+
+    <div class="order-summary" id="orderSummary">
+        <div class="summary-title"><i class="fas fa-shopping-bag"></i> Ваш заказ</div>
+        <div id="summaryItems"></div>
+        <div class="summary-total">
+            <span class="total-label">Итого к оплате:</span>
+            <span class="total-price" id="summaryTotal">$0</span>
+        </div>
+    </div>
+
+    <div class="form-wrapper" id="formWrapper">
+        <form id="orderForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Имя <span class="required">*</span></label>
+                    <div class="input-wrap">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="name" placeholder="Алексей" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Телефон <span class="required">*</span></label>
+                    <div class="input-wrap">
+                        <i class="fas fa-phone"></i>
+                        <input type="tel" id="phone" placeholder="+7 (999) 123-45-67" required />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <div class="input-wrap">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" placeholder="example@stunt.com" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Адрес доставки <span class="required">*</span></label>
+                <div class="input-wrap">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <input type="text" id="address" placeholder="Город, улица, дом" required />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Способ оплаты</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-credit-card"></i>
+                        <select id="payment">
+                            <option value="card">Банковская карта</option>
+                            <option value="cash">Наличные при получении</option>
+                            <option value="paypal">PayPal</option>
+                            <option value="crypto">Криптовалюта</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Способ доставки</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-truck"></i>
+                        <select id="delivery">
+                            <option value="courier">Курьером</option>
+                            <option value="pickup">Самовывоз</option>
+                            <option value="post">Почта</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Комментарий к заказу</label>
+                <div class="input-wrap">
+                    <i class="fas fa-comment"></i>
+                    <textarea id="comment" placeholder="Дополнительные пожелания..."></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-order" id="submitOrderBtn">
+                <i class="fas fa-bolt"></i> Подтвердить заказ
+            </button>
+        </form>
+    </div>
+
+    <div class="success-state" id="successState">
+        <i class="fas fa-check-circle"></i>
+        <h3>Заказ оформлен! 🎉</h3>
+        <p>Мы свяжемся с вами в ближайшее время для подтверждения.</p>
+        <a href="index.html" class="btn-back"><i class="fas fa-home"></i> На главную</a>
+    </div>
+
+    <div class="order-footer"><i class="fas fa-lock"></i> Ваши данные защищены</div>
+</div>
+
+<script>
+    let cartData = JSON.parse(localStorage.getItem('stuntOrderData')) || [];
+    let totalPrice = 0;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('product');
+
+    function getProductInfo(id) {
+        const demoProducts = {
+            'b1': { name: 'StuntMaster 26', price: 1890 },
+            'b2': { name: 'StreetFighter 20', price: 1450 },
+            'b3': { name: 'DirtJump 24', price: 1670 },
+            'b4': { name: 'FlatPro', price: 2100 },
+            'b5': { name: 'ParkRider 22', price: 1750 },
+            'b6': { name: 'Street King', price: 1980 },
+            'b7': { name: 'Dirt Evo', price: 2250 },
+            'b8': { name: 'Flat Master', price: 1890 },
+            'b9': { name: 'Extreme Pro', price: 2650 },
+            'b10': { name: 'Urban Warrior', price: 1720 },
+            'b11': { name: 'Dirt Storm', price: 1950 },
+            'b12': { name: 'Park King', price: 1600 },
+            'b13': { name: 'Flat Blade', price: 2050 },
+            'b14': { name: 'Street Shadow', price: 1550 },
+            'b15': { name: 'Extreme Carbon', price: 3200 },
+            'hero': { name: 'StuntRider X', price: 1240 }
+        };
+        return demoProducts[id] || null;
+    }
+
+    if (productId) {
+        const product = getProductInfo(productId);
+        if (product) {
+            const existing = cartData.find(item => item.id === productId);
+            if (existing) existing.qty += 1;
+            else cartData.push({ id: productId, name: product.name, price: product.price, qty: 1 });
+            localStorage.setItem('stuntOrderData', JSON.stringify(cartData));
+        }
+    }
+
+    function renderSummary() {
+        const container = document.getElementById('summaryItems');
+        const totalEl = document.getElementById('summaryTotal');
+        const submitBtn = document.getElementById('submitOrderBtn');
+
+        if (cartData.length === 0) {
+            container.innerHTML = `
+                <div class="empty-cart-message">
+                    <i class="fas fa-shopping-bag"></i>
+                    <p>Корзина пуста</p>
+                    <a href="menu.html"><i class="fas fa-arrow-left"></i> Вернуться в меню</a>
+                </div>
+            `;
+            totalEl.textContent = '$0';
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.5';
+            return;
+        }
+
+        let html = '';
+        let total = 0;
+        cartData.forEach(item => {
+            const subtotal = item.price * item.qty;
+            total += subtotal;
+            html += `
+                <div class="summary-item">
+                    <span class="item-name">${item.name}</span>
+                    <span>
+                        <span class="item-qty">x${item.qty}</span>
+                        <span class="item-price">$${subtotal}</span>
+                    </span>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+        totalEl.textContent = `$${total}`;
+        totalPrice = total;
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+    }
+
+    renderSummary();
+
+    document.getElementById('orderForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const name = document.getElementById('name').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const address = document.getElementById('address').value.trim();
+
+        if (!name || !phone || !address) {
+            alert('Пожалуйста, заполните все обязательные поля.');
+            return;
+        }
+
+        const orderData = {
+            items: cartData, total: totalPrice, name: name, phone: phone,
+            email: document.getElementById('email').value.trim(),
+            address: address, payment: document.getElementById('payment').value,
+            delivery: document.getElementById('delivery').value,
+            comment: document.getElementById('comment').value.trim(),
+            date: new Date().toLocaleString()
+        };
+
+        const orders = JSON.parse(localStorage.getItem('stuntOrders')) || [];
+        orders.push(orderData);
+        localStorage.setItem('stuntOrders', JSON.stringify(orders));
+
+        localStorage.removeItem('stuntCart');
+        localStorage.removeItem('stuntOrderData');
+
+        document.getElementById('formWrapper').classList.add('hidden');
+        document.getElementById('successState').classList.add('show');
+        document.querySelector('.order-container').scrollIntoView({ behavior: 'smooth' });
+    });
+</script>
+
+</body>
+</html>
